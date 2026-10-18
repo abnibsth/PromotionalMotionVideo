@@ -1,0 +1,10 @@
+{
+  "description": "Streamline business operations with integrated software solutions, enhancing efficiency and connectivity across various enterprise functions.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

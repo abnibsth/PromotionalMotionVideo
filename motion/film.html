@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<title>BPG — Everything Connected</title>
+<style>
+@font-face{font-family:Geist;src:url(assets/geist.woff2) format('woff2');font-weight:100 900;font-display:block}
+@font-face{font-family:'Geist Mono';src:url(assets/geistmono.woff2) format('woff2');font-weight:100 900;font-display:block}
+:root{--canvas:#FAF8F3;--canvas2:#F3EEE4;--card:#FFFFFF;--ink:#202331;--green:#B8924A;--green2:#D9B877;--muted:#696D78;--border:#E8E1D3;--line:#E2D3B3;
+  --forest:#202331;--gold:#B8924A;--goldL:#D9B877;--goldD:#8E6A2D;
+  --shadow:0 1px 2px rgba(32,35,49,.05),0 6px 16px -6px rgba(32,35,49,.08),0 24px 48px -24px rgba(32,35,49,.16)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--canvas)}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;font-family:Geist,sans-serif;color:var(--ink);
+  background:radial-gradient(75% 65% at 50% 42%,#FFFEFB 0%,#FAF8F3 52%,#F3EEE4 100%)}
+#grid{position:absolute;left:-400px;top:-400px;width:2720px;height:1880px;
+  background-image:linear-gradient(rgba(32,35,49,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(32,35,49,.045) 1px,transparent 1px);
+  background-size:80px 80px;-webkit-mask-image:radial-gradient(62% 62% at 50% 50%,#000 25%,transparent 85%)}
+#lightL{position:absolute;inset:0;pointer-events:none;background:radial-gradient(40% 35% at 50% 30%,rgba(255,255,255,.7),transparent 70%)}
+#dark{position:absolute;inset:0;background:radial-gradient(70% 70% at 50% 36%,#2A2E40 0%,#202331 55%,#141620 100%);visibility:hidden}
+#dark::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);
+  background-size:80px 80px;-webkit-mask-image:radial-gradient(60% 60% at 50% 45%,#000 25%,transparent 80%)}
+#glow{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;opacity:0;
+  background:radial-gradient(30% 40% at 50% 36%,rgba(217,184,119,.16),transparent 70%)}
+#world{position:absolute;left:960px;top:540px;width:0;height:0;transform-origin:0 0}
+svg.layer{position:absolute;z-index:0;left:-2000px;top:-1500px;width:4000px;height:3000px;overflow:visible}
+.card{position:absolute;left:0;top:0;background:var(--card);color:var(--ink);border-radius:16px;
+  border:1px solid var(--border);padding:24px;transform-origin:50% 50%;overflow:hidden;box-shadow:var(--shadow)}
+.ring{position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;border:1.5px solid var(--line);opacity:0}
+.hd{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.tile{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;flex:none;background:var(--canvas2)}
+.tile svg{width:22px;height:22px;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.eb{font-family:'Geist Mono',monospace;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.ttl{font-size:20px;font-weight:600;letter-spacing:-.015em;margin-top:3px;color:var(--ink)}
+.trx{margin-left:auto;align-self:flex-start;font-family:'Geist Mono',monospace;font-size:11.5px;color:var(--muted);background:var(--canvas);border:1px solid var(--border);padding:4px 9px;border-radius:999px}
+.trx:empty{display:none}
+.row{display:flex;justify-content:space-between;align-items:center;font-size:15px;height:30px;padding:0 8px;margin:0 -8px;border-radius:8px;color:#3F4250}
+.row b{font-weight:600;color:var(--ink)}
+.row small{font-size:12px;color:var(--muted);margin-left:4px;font-weight:400}
+.mono{font-family:'Geist Mono',monospace}
+.div{height:1px;background:var(--border);margin:6px 0}
+.btn{position:absolute;left:24px;right:24px;bottom:22px;height:42px;border-radius:11px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:15px}
+.chip{position:absolute;left:24px;bottom:20px;display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:500;padding:6px 11px;border-radius:999px;background:#F4F0E8;color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:50%;background:#BDB3A1}
+.bars{display:flex;align-items:flex-end;gap:8px;height:64px;margin-top:12px}
+.bars i{flex:1;border-radius:5px 5px 2px 2px;background:#EDE6D6}
+.pc{width:300px;height:196px;padding:22px}
+.pc .eb{color:var(--goldD)}
+.pc .ttl{font-size:20px;margin-top:8px}
+.pc .tg{font-size:14px;color:var(--muted);margin-top:6px;line-height:1.4;max-width:196px}
+.pc .tile{position:absolute;right:20px;bottom:20px;width:46px;height:46px;border-radius:13px}
+#logoG{position:absolute;left:0;top:0;z-index:80;width:348px;height:348px;transform-origin:50% 50%;border-radius:50%}
+#logoG img{position:absolute;inset:0;width:100%;height:100%}
+#logoSh{position:absolute;inset:6px;border-radius:50%;box-shadow:0 30px 60px -24px rgba(32,35,49,.35),0 8px 20px -10px rgba(32,35,49,.2)}
+#token{position:absolute;left:0;top:0;z-index:90;width:22px;height:22px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#F0D9A4,#B8924A 70%);border:3px solid #fff;box-shadow:0 4px 12px -2px rgba(184,146,74,.45),0 0 0 6px rgba(217,184,119,.14)}
+#tlabel{position:absolute;left:0;top:0;z-index:91;white-space:nowrap;font-family:'Geist Mono',monospace;font-size:13.5px;font-weight:500;color:var(--ink);
+  background:#fff;border:1px solid var(--border);padding:6px 11px;border-radius:999px;box-shadow:0 8px 20px -10px rgba(32,35,49,.3)}
+.hl{position:absolute;left:0;width:1920px;text-align:center;font-weight:560;letter-spacing:.01em;line-height:1;color:var(--ink)}
+.hl .w{display:inline-block;overflow:hidden;padding:.08em .04em .12em;margin:-.08em 0 -.12em;vertical-align:top}
+.hl .w>span{display:inline-block}
+.sub{font-family:'Geist Mono',monospace;font-weight:500;letter-spacing:.22em;color:var(--goldD)}
+#steps{position:absolute;left:0;top:952px;width:1920px;display:flex;justify-content:center;align-items:center;gap:16px;
+  font-family:'Geist Mono',monospace;font-size:14px;font-weight:500;letter-spacing:.14em}
+#steps .s{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--muted)}
+#steps .s i{width:8px;height:8px;border-radius:50%;background:#D8CDB6}
+#steps .ar{width:46px;height:2px;border-radius:2px;background:var(--border);position:relative;overflow:hidden}
+#steps .ar b{position:absolute;inset:0;background:var(--green);transform-origin:0 50%}
+#note{position:absolute;right:56px;bottom:40px;font-family:'Geist Mono',monospace;font-size:13px;letter-spacing:.08em;color:var(--muted)}
+#browser{position:absolute;left:0;top:0;border-radius:16px;overflow:hidden;background:#F4F0E8;
+  box-shadow:0 0 0 1px var(--border),0 10px 24px -10px rgba(32,35,49,.14),0 50px 100px -40px rgba(32,35,49,.3)}
+#bin{position:absolute;left:0;top:0;width:1360px;height:820px;transform-origin:0 0}
+#bbar{position:absolute;left:0;top:0;width:1360px;height:44px;background:#F4F0E8;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:8px}
+#bbar .d{width:12px;height:12px;border-radius:50%;background:#D5DED7}
+#url{position:absolute;left:50%;transform:translateX(-50%);width:420px;height:28px;border-radius:8px;background:#fff;border:1px solid var(--border);color:#3F4250;font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px}
+#vp{position:absolute;left:0;top:44px;width:1360px;height:776px;overflow:hidden;background:#FFFDF8}
+#site{position:absolute;left:0;top:0;width:1360px}
+.lift{position:absolute;overflow:hidden;border-radius:14px;background-image:url(assets/site_full.png);background-size:1360px auto;transform-origin:50% 50%}
+#cursor{position:absolute;left:0;top:0;width:26px;height:26px}
+#end{position:absolute;left:0;top:0;width:1920px;height:1080px}
+#end .hl{color:#FAF8F3}
+#cta{display:inline-flex;align-items:center;gap:12px;height:56px;padding:0 28px;border-radius:999px;background:var(--gold);color:#fff;font-size:20px;font-weight:600}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="grid"></div>
+  <div id="lightL"></div>
+  <div id="dark"></div>
+  <div id="glow"></div>
+  <div id="world">
+    <svg class="layer" id="back" viewBox="-2000 -1500 4000 3000"></svg>
+    <div id="cards"></div>
+    <svg class="layer" id="front" style="z-index:85" viewBox="-2000 -1500 4000 3000"></svg>
+    <div id="logoG"><div id="logoSh"></div><img src="assets/logo_badge.png" alt="Bintang Pitu Global" /></div>
+    <div id="token"></div>
+    <div id="tlabel"></div>
+  </div>
+  <div id="browser"><div id="bin">
+    <div id="bbar"><span class="d"></span><span class="d"></span><span class="d"></span>
+      <div id="url"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#696D78" stroke-width="2.2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>bintangpituglobal.com</div></div>
+    <div id="vp"><img id="site" src="assets/site_full.png" alt="" /><div id="lifts"></div>
+      <svg id="cursor" viewBox="0 0 24 24"><path d="M4 2l15 9.5-6.6 1.3L9 19z" fill="#202331" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+  </div></div>
+  <div id="texts"></div>
+  <div id="steps"></div>
+  <div id="note"></div>
+  <div id="end"></div>
+</div>
+<script src="film.js"></script>
+</body>
+</html>

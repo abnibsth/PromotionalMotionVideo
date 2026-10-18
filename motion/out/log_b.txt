@@ -1,0 +1,6 @@
+frame 480/1140 1s
+frame 600/1140 68s
+frame 720/1140 126s
+frame 840/1140 191s
+frame 960/1140 260s
+frame 1080/1140 336s

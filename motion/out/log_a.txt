@@ -1,0 +1,4 @@
+frame 0/480 1s
+frame 120/480 64s
+frame 240/480 130s
+frame 360/480 194s
